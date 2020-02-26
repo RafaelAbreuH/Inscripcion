@@ -1,0 +1,96 @@
+﻿@page "/CPagos"
+
+
+
+<div class="container">
+
+    <h3 class="display-4 text-center">Consulta de Pagos</h3>
+    <p class="text-muted">@Mensaje</p>
+
+    <div>
+
+        @if (Lista.Count == 0)
+        {
+            if (Cargando == false)
+            {
+                <div class="text-center">
+                    <div class="spinner-border">
+                        <span class="sr-only">Loading....</span>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <p class="display-3 text-center">No hay datos que mostrar</p>
+            }
+
+        }
+        else
+        {
+            <table class="table">
+
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">Id</th>
+                        <th scope="col">Fecha</th>
+                        <th scope="col">Inscripcion</th>
+                        <th scope="col">Monto</th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+                    @foreach (var obj in Lista)
+                    {
+                        <tr>
+                            <td scope="row">@obj.PagoId</td>
+                            <td>@obj.Fecha.ToString("dd/MM/yyyy");</td>
+                            <td>@obj.InscripcionId</td>
+                            <td>@obj.Monto</td>
+                            <td><a class="btn btn-sm btn-outline-primary" href="Pagos/@obj.PagoId">Ver</a></td>
+                        </tr>
+                    }
+
+
+                </tbody>
+
+            </table>
+
+        }
+
+
+    </div>
+
+</div>
+
+@code {
+
+
+    public List<Pagos> Lista { get; set; }
+    public string Mensaje { get; set; }
+    public bool Cargando { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Lista = new List<Pagos>();
+        Cargando = false;
+
+        try
+        {
+            await Task.Run(() => { CargarLista(); });
+        }
+        catch (Exception)
+        {
+
+            Mensaje = "Error!!";
+        }
+    }
+
+    private void CargarLista()
+    {
+        Lista = PagoController.GetList(A => true);
+        Cargando = true;
+    }
+}

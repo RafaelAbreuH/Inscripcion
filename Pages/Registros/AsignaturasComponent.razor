@@ -1,0 +1,134 @@
+﻿@page "/Asignaturas/{AsignaturaId:int}"
+
+<div class="container">
+    <h3 class="display-4 text-center">Registro de Asignaturas</h3>
+
+
+    <EditForm Model="Asignatura" OnValidSubmit="Guardar">
+        <DataAnnotationsValidator />
+
+        <div class="form-group">
+            <label>AsignaturaId</label>
+                <InputNumber @bind-Value="Asignatura.AsignaturaId" class="form-control"></InputNumber>
+                    <button type="button" class="btn btn-primary input-group-text" @onclick="Buscar">Buscar</button>
+        </div>
+
+        <div class="form-group">
+            <label>Codigo</label>
+            <InputText @bind-Value="Asignatura.Codigo" class="form-control"></InputText>
+        </div>
+
+        <div class="form-group">
+            <label>Descripcion</label>
+            <InputText @bind-Value="Asignatura.Descripcion" class="form-control"></InputText>
+        </div>
+
+        <div class="form-group">
+            <label>PreRequisitos</label>
+            <InputNumber @bind-Value="Asignatura.PreRequisito" class="form-control"></InputNumber>
+        </div>
+
+        <div class="form-group">
+            <label>Creditos</label>
+            <InputNumber @bind-Value="Asignatura.Creditos" class="form-control"></InputNumber>
+        </div>
+
+        <ValidationSummary />
+        <p class="text-info">@Mensaje</p>
+
+        <div class="form-group">
+            <button type="button" class="btn btn-primary" @onclick="Limpiar">Limpiar</button>
+            <button type="submit" class="btn btn-success">Guardar</button>
+            <button type="button" class="btn btn-danger" @onclick="Eliminar">Eliminar</button>
+        </div>
+
+    </EditForm>
+
+</div>
+
+@code {
+    [Parameter]
+    public int AsignaturaId { get; set; }
+    public Asignaturas Asignatura { get; set; }
+    public string Mensaje { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Asignatura = new Asignaturas();
+        if (AsignaturaId > 0)
+        {
+            Asignatura.AsignaturaId = AsignaturaId;
+            Buscar();
+        }
+    }
+
+    private void Limpiar()
+    {
+        Asignatura = new Asignaturas();
+        Mensaje = string.Empty;
+    }
+    private void Guardar()
+    {
+
+        try
+        {
+            if (AsignaturaController.Guardar(Asignatura))
+            {
+                Mensaje = "Gurdado correctamente";
+                Asignatura = new Asignaturas();
+            }
+            else
+            {
+                Mensaje = "No se pudo guardar";
+            }
+        }
+        catch (Exception)
+        {
+
+            Mensaje = "Error!!";
+        }
+    }
+
+    private void Buscar()
+    {
+        try
+        {
+            Asignaturas asignatura = AsignaturaController.Buscar(Asignatura.AsignaturaId);
+            if (asignatura != null)
+            {
+                Asignatura = asignatura;
+                Mensaje = string.Empty;
+
+            }
+            else
+            {
+                Mensaje = "No se Encontro";
+            }
+        }
+        catch (Exception)
+        {
+
+            Mensaje = " Error!!";
+        }
+    }
+
+    private void Eliminar()
+    {
+        try
+        {
+            if (AsignaturaController.Eliminar(Asignatura.AsignaturaId))
+            {
+                Mensaje = "Eliminado correctamente";
+                Asignatura = new Asignaturas();
+            }
+            else
+            {
+                Mensaje = "No se pudo eliminar";
+            }
+        }
+        catch (Exception)
+        {
+            Mensaje = "Error!!";
+        }
+    }
+}

@@ -1,0 +1,134 @@
+﻿@page "/Pagos/{PagoId:int}"
+
+<div class="container">
+    <h3 class="display-4 text-center">Registro de Pagos</h3>
+
+
+    <EditForm Model="Pago" OnValidSubmit="Guardar">
+        <DataAnnotationsValidator />
+
+        <div class="form-group">
+            <label>PagoId</label>
+                <InputNumber @bind-Value="Pago.PagoId" class="form-control"></InputNumber>
+                    <button type="button" class="btn btn-primary input-group-text" @onclick="Buscar">Buscar</button>
+        </div>
+
+        <div class="form-group">
+            <label>Fecha</label>
+            <InputDate @bind-Value="Pago.Fecha" class="form-control"></InputDate>
+        </div>
+
+        <div class="form-group">
+            <label>inscripcionId</label>
+            <InputNumber @bind-Value="Pago.InscripcionId" class="form-control"></InputNumber>
+        </div>
+
+        <div class="form-group">
+            <label>Monto</label>
+            <InputNumber @bind-Value="Pago.Monto" class="form-control"></InputNumber>
+        </div>
+
+
+        <ValidationSummary />
+        <p class="text-info">@Mensaje</p>
+
+        <div class="form-group">
+            <button type="button" class="btn btn-primary" @onclick="Limpiar">Limpiar</button>
+            <button type="submit" class="btn btn-success">Guardar</button>
+            <button type="button" class="btn btn-danger" @onclick="Eliminar">Eliminar</button>
+        </div>
+
+    </EditForm>
+
+</div>
+
+@code {
+    [Parameter]
+    public int PagoId { get; set; }
+    public Pagos Pago { get; set; }
+    public string Mensaje { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Pago = new Pagos();
+
+        if (PagoId > 0)
+        {
+            Pago.PagoId = PagoId;
+            Buscar();
+        }
+
+    }
+
+    private void Limpiar()
+    {
+        Pago = new Pagos();
+        Mensaje = string.Empty;
+    }
+
+    private void Guardar()
+    {
+        try
+        {
+            if (PagoController.Guardar(Pago))
+            {
+                Mensaje = "Gurdado correctamente";
+                Pago = new Pagos();
+            }
+            else
+            {
+                Mensaje = "No se pudo guardar";
+            }
+        }
+        catch (Exception)
+        {
+
+            Mensaje = "Error!!";
+        }
+    }
+
+    private void Buscar()
+    {
+        try
+        {
+            Pagos pago = PagoController.Buscar(Pago.PagoId);
+            if (pago != null)
+            {
+                Pago = pago;
+                Mensaje = string.Empty;
+
+            }
+            else
+            {
+                Mensaje = "No se Encontro";
+            }
+        }
+        catch (Exception)
+        {
+
+            Mensaje = "Error!!";
+        }
+    }
+
+    private void Eliminar()
+    {
+        try
+        {
+            if (PagoController.Eliminar(Pago.PagoId))
+            {
+                Mensaje = "Eliminado correctamente";
+                Pago = new Pagos();
+            }
+            else
+            {
+                Mensaje = "No se pudo eliminar";
+            }
+        }
+        catch (Exception)
+        {
+            Mensaje = "Error!";
+        }
+    }
+
+
+}

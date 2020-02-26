@@ -1,0 +1,132 @@
+﻿@page "/Estudiantes/{EstudianteId:int}"
+
+<div class="container">
+    <h3 class="display-4 text-center">Registro de Estudiantes</h3>
+
+
+    <EditForm Model="Estudiante" OnValidSubmit="Guardar">
+        <DataAnnotationsValidator />
+
+        <div class="form-group">
+            <label>EstudianteId</label>
+                <InputNumber @bind-Value="Estudiante.EstudianteId" class="form-control"></InputNumber>
+                    <button type="button" class="btn btn-primary input-group-text" @onclick="Buscar">Buscar</button>
+        </div>
+
+        <div class="form-group">
+            <label>Matricula</label>
+            <InputText @bind-Value="Estudiante.Matricula" class="form-control"></InputText>
+        </div>
+
+        <div class="form-group">
+            <label>Nombres</label>
+            <InputText @bind-Value="Estudiante.Nombres" class="form-control"></InputText>
+        </div>
+
+        <div class="form-group">
+            <label>Balance</label>
+            <InputNumber @bind-Value="Estudiante.Balance" class="form-control"></InputNumber>
+        </div>
+
+        <ValidationSummary />
+        <p class="text-info">@Mensaje</p>
+
+        <div class="form-group">
+            <button type="button" class="btn btn-primary" @onclick="Limpiar">Limpiar</button>
+            <button type="submit" class="btn btn-success">Guardar</button>
+            <button type="button" class="btn btn-danger" @onclick="Eliminar">Eliminar</button>
+        </div>
+
+    </EditForm>
+
+</div>
+
+@code {
+    [Parameter]
+    public int EstudianteId { get; set; }
+    public Estudiantes Estudiante { get; set; }
+    public string Mensaje { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Estudiante = new Estudiantes();
+        if (EstudianteId > 0)
+        {
+            Estudiante.EstudianteId = EstudianteId;
+            Buscar();
+        }
+    }
+
+        private void Limpiar()
+    {
+        Estudiante = new Estudiantes();
+        Mensaje = string.Empty;
+    }
+
+    private void Guardar()
+    {
+
+        try
+        {
+            if (EstudianteController.Guardar(Estudiante))
+            {
+                Mensaje = "Guardado correctamente";
+                Estudiante = new Estudiantes();
+            }
+            else
+            {
+                Mensaje = "No se pudo guardar";
+            }
+        }
+        catch (Exception)
+        {
+
+            Mensaje = "Error!!";
+        }
+    }
+
+    private void Buscar()
+    {
+        try
+        {
+            Estudiantes estudiante = EstudianteController.Buscar(Estudiante.EstudianteId);
+            if (estudiante != null)
+            {
+                Estudiante = estudiante;
+                Mensaje = string.Empty;
+
+            }
+            else
+            {
+                Mensaje = "No se Encontro";
+            }
+        }
+        catch (Exception)
+        {
+
+            Mensaje = "Error!!";
+        }
+    }
+
+    private void Eliminar()
+    {
+        try
+        {
+            if (EstudianteController.Eliminar(Estudiante.EstudianteId))
+            {
+                Mensaje = "Eliminado correctamente";
+                Estudiante = new Estudiantes();
+            }
+            else
+            {
+                Mensaje = "No se pudo eliminar";
+            }
+        }
+        catch (Exception)
+        {
+            Mensaje = "Error!!";
+        }
+    }
+
+
+}

@@ -1,0 +1,168 @@
+﻿@page "/Inscripcion/{InscripcionId:int}"
+
+<div class="container">
+    <h3 class="display-4 text-center">Registro de Inscripciones</h3>
+
+
+    <EditForm Model="Inscripcion" OnValidSubmit="Guardar">
+        <DataAnnotationsValidator />
+
+        <div class="form-group">
+            <label>InscripcionId</label>
+                <InputNumber @bind-Value="Inscripcion.InscripcionId" class="form-control"></InputNumber>
+                    <button type="button" class="btn btn-primary input-group-text" @onclick="Buscar">Buscar</button>
+        </div>
+
+        <div class="form-group">
+            <label>EstudianteId</label>
+            <div class="input-group">
+                <InputNumber @bind-Value="Inscripcion.EstudianteId" class="form-control"></InputNumber>
+                <div class="input-group-append">
+                    <button type="button" class="btn btn-primary input-group-text">Buscar</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Fecha</label>
+            <InputDate @bind-Value="Inscripcion.Fecha" class="form-control"></InputDate>
+        </div>
+
+
+        <div class="form-group">
+            <label>Semestre</label>
+            <InputText @bind-Value="Inscripcion.Semestre" class="form-control"></InputText>
+        </div>
+
+        <div class="form-group">
+            <label>Limite</label>
+            <InputNumber @bind-Value="Inscripcion.Limite" @oninput="CalcularDisponibles" @onfocus="CalcularDisponibles" @onfocusin="CalcularDisponibles" @onfocusout="CalcularDisponibles"  class="form-control"></InputNumber>
+        </div>
+
+        <div class="form-group">
+            <label>Tomados</label>
+            <InputNumber @bind-Value="Inscripcion.Tomados" @oninput="CalcularDisponibles" @onfocus="CalcularDisponibles" @onfocusin="CalcularDisponibles" @onfocusout="CalcularDisponibles"  class="form-control"></InputNumber>
+        </div>
+
+        <div class="form-group">
+            <label>Disponibles</label>
+            <InputNumber @bind-Value="Inscripcion.Disponibles" class="form-control" ReadOnly="true"></InputNumber>
+        </div>
+
+        <div class="form-group">
+            <label>Monto</label>
+            <InputNumber @bind-Value="Inscripcion.Monto" class="form-control"></InputNumber>
+        </div>
+
+        <div class="form-group">
+            <label>Balance</label>
+            <InputNumber @bind-Value="Inscripcion.Balance" class="form-control"></InputNumber>
+        </div>
+
+        <ValidationSummary />
+        <p class="text-info">@Mensaje</p>
+
+        <div class="form-group">
+            <button type="button" class="btn btn-primary" @onclick="Limpiar">Limpiar</button>
+            <button type="submit" class="btn btn-success">Guardar</button>
+            <button type="button" class="btn btn-danger" @onclick="Eliminar">Eliminar</button>
+        </div>
+
+    </EditForm>
+
+</div>
+
+@code {
+    [Parameter]
+    public int InscripcionId { get; set; }
+    public Inscripciones Inscripcion { get; set; }
+    public string Mensaje { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Inscripcion = new Inscripciones();
+
+        if (InscripcionId > 0)
+        {
+            Inscripcion.InscripcionId = InscripcionId;
+            Buscar();
+        }
+
+    }
+    
+    private void Limpiar()
+    {
+        Inscripcion = new Inscripciones();
+        Mensaje = string.Empty;
+    }
+
+    private void CalcularDisponibles()
+    {
+        Inscripcion.Disponibles = Inscripcion.Limite - Inscripcion.Tomados;
+    }
+
+
+    private void Guardar()
+    {
+        CalcularDisponibles();
+        try
+        {
+            if (InscripcionController.Guardar(Inscripcion))
+            {
+                Mensaje = "Gurdado correctamente";
+                Inscripcion = new Inscripciones();
+            }
+            else
+            {
+                Mensaje = "No se pudo guardar";
+            }
+        }
+        catch (Exception)
+        {
+            Mensaje = "Hubo un Error!!";
+        }
+    }
+
+    private void Buscar()
+    {
+        try
+        {
+            Inscripciones inscripcion = InscripcionController.Buscar(Inscripcion.InscripcionId);
+            if (inscripcion != null)
+            {
+                Inscripcion = inscripcion;
+                Mensaje = string.Empty;
+            }
+            else
+            {
+                Mensaje = "No se Encontro";
+            }
+        }
+        catch (Exception)
+        {
+            Mensaje = "Error!!";
+        }
+    }
+
+    private void Eliminar()
+    {
+        try
+        {
+            if (InscripcionController.Eliminar(Inscripcion.InscripcionId))
+            {
+                Mensaje = "Eliminado correctamente";
+                Inscripcion = new Inscripciones();
+            }
+            else
+            {
+                Mensaje = "No se pudo eliminar";
+            }
+        }
+        catch (Exception)
+        {
+            Mensaje = "Error!!";
+        }
+    }
+
+
+}

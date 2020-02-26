@@ -1,0 +1,99 @@
+﻿@page "/CEstudiantes"
+
+
+
+<div class="container">
+
+    <h3 class="display-4 text-center">Consulta de Estudiantes</h3>
+    <p class="text-muted">@Mensaje</p>
+
+    <div>
+
+        @if (Lista.Count == 0)
+        {
+            if (Cargando == false)
+            {
+                <div class="text-center">
+                    <div class="spinner-border">
+                        <span class="sr-only">Loading....</span>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <p class="display-3 text-center">No hay datos que mostrar</p>
+            }
+
+        }
+        else
+        {
+            <table class="table">
+
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">Id</th>
+                        <th scope="col">Matricula</th>
+                        <th scope="col">Nombres</th>
+                        <th scope="col">Balance</th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+                    @foreach (var obj in Lista)
+                    {
+                        <tr>
+                            <td scope="row">@obj.EstudianteId</td>
+                            <td>@obj.Matricula</td>
+                            <td>@obj.Nombres</td>
+                            <td>@obj.Balance</td>
+                            <td><a class="btn btn-sm btn-outline-primary" href="Estudiantes/@obj.EstudianteId">Ver</a></td>
+
+                        </tr>
+                    }
+
+
+                </tbody>
+
+            </table>
+
+        }
+
+
+    </div>
+
+</div>
+
+@code {
+
+
+    public List<Estudiantes> Lista { get; set; }
+    public string Mensaje { get; set; }
+    public bool Cargando { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Lista = new List<Estudiantes>();
+        Cargando = false;
+
+        try
+        {
+            await Task.Run(() => { CargarLista(); });
+        }
+        catch (Exception)
+        {
+
+            Mensaje = "Error!!";
+        }
+    }
+
+    private void CargarLista()
+    {
+        Lista = EstudianteController.GetList(A => true);
+        Cargando = true;
+    }
+
+
+}
